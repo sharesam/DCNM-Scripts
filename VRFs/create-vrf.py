@@ -19,7 +19,7 @@ headers_token = {'Content-Type': 'application/json', 'dcnm-token': str(dcnm_toke
 
 # this section loads the VRF.xlsx into the program
 
-wb = load_workbook('/Users/krishna/python-projects/My_venvs/venv1-enterprise/DCNM-Python-Testing/VRFs/VRF-Details.xlsx')
+wb = load_workbook('/Users/krishna/python-projects/My_venvs/venv1-enterprise/dcnm-python-Testing/VRFs/VRF-Details.xlsx')
 vrf_add = wb["VRF-Create"]
 url_vrf_add = f"https://{dcnm_ip}/rest/top-down/fabrics/{fabric_name}/vrfs"
 # url_role = f"https://{dcnm_ip}/rest/control/switches/roles" ####default role is Leaf

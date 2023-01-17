@@ -3,7 +3,7 @@ import requests
 from openpyxl import load_workbook
 from DCNM_Authentication import headers_token, fabric_name, url_logout, dcnm_ip
 
-wb = load_workbook('/Users/krishna/python-projects/My_venvs/venv1-enterprise/DCNM-Python/VRFs/VRF-Details.xlsx')
+wb = load_workbook('//VRFs/VRF-Details.xlsx')
 vrf_attach = wb["VRF-Association"]
 url_vrf_attach = f"https://{dcnm_ip}/rest/top-down/fabrics/{fabric_name}/vrfs/attachments"
 
