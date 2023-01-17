@@ -16,4 +16,4 @@ dcnm_token = json.loads(response.text)['Dcnm-Token']  # the token returned from 
 headers_token = {'Content-Type': 'application/json', 'dcnm-token': str(dcnm_token)}
 
 if __name__ == '__main__':
-    print(headers_token)
+    print(headers_token)  # prints the token
