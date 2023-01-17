@@ -14,3 +14,6 @@ request_body = {"expirationTime": "999999"}
 response = requests.post(url_login, headers=headers, auth=dcnm_creds, verify=False, data=json.dumps(request_body))
 dcnm_token = json.loads(response.text)['Dcnm-Token']  # the token returned from dcnm is stored in this variable
 headers_token = {'Content-Type': 'application/json', 'dcnm-token': str(dcnm_token)}
+
+if __name__ == '__main__':
+    print(headers_token)
