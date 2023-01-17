@@ -3,7 +3,7 @@ import requests
 from openpyxl import load_workbook
 from DCNM_Authentication import headers_token, fabric_name, url_logout, dcnm_ip
 
-wb = load_workbook('/Users/krishna/python-projects/My_venvs/venv1-enterprise/DCNM-Python/VRFs/VRF-Details.xlsx')
+wb = load_workbook('//VRFs/VRF-Details.xlsx')
 vrf_attach = wb["VRF-Association"]
 url_vrf_attach = f"https://{dcnm_ip}/rest/top-down/fabrics/{fabric_name}/vrfs/attachments"
 
@@ -48,6 +48,6 @@ for i in range(2, len(vrf_attach['A']) + 1):
                                ]}]
         requests.post(url_vrf_attach, headers=headers_token, verify=False, data=json.dumps(vrf_attach_details))
         print(f"vrf {vrf_attach[f'A{i}'].value} attached")
-        print(f"========================================")
+        print("========================================")
 
 requests.post(url_logout, headers=headers_token, verify=False)
