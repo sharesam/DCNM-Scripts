@@ -48,6 +48,6 @@ for i in range(2, len(vrf_attach['A']) + 1):
                                ]}]
         requests.post(url_vrf_attach, headers=headers_token, verify=False, data=json.dumps(vrf_attach_details))
         print(f"vrf {vrf_attach[f'A{i}'].value} attached")
-        print(f"========================================")
+        print("========================================")
 
 requests.post(url_logout, headers=headers_token, verify=False)
