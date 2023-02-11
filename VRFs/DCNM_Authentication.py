@@ -2,7 +2,7 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-dcnm_ip = "10.122.104.55"
+dcnm_ip = "10.122.4.139"
 fabric_name = "SoAZ-PHX"
 url_login = f"https://{dcnm_ip}/rest/logon"
 url_logout = f"https://{dcnm_ip}/rest/logout"
