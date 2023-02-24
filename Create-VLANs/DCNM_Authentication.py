@@ -2,12 +2,12 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 
-dcnm_ip = "10.59.10.80"
+dcnm_ip = "10.122.4.139"
 fabric_name = "SoAZ-PHX"
 url_login = f"https://{dcnm_ip}/rest/logon"
 url_logout = f"https://{dcnm_ip}/rest/logout"
 requests.packages.urllib3.disable_warnings()
-dcnm_creds = HTTPBasicAuth('kharesamudram', 'Kp2daySbP!')
+dcnm_creds = HTTPBasicAuth('admin', 'C!sc0123')
 headers = {'Content-Type': 'application/json'}
 request_body = {"expirationTime": "999999"}
 
