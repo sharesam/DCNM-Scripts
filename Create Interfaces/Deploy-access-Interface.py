@@ -5,7 +5,7 @@ from DCNM_Authentication import headers_token, dcnm_ip, url_logout
 
 # this section loads the Interface-Details.xlsx into the program
 
-wb = load_workbook('Interface-Details.xlsx')
+wb = load_workbook('Interface-Details-Retirement.xlsx')
 access_interface_add = wb["Access-Interface-Details"]
 url_access_int_add = f"https://{dcnm_ip}/rest/interface"
 url_access_int_deploy = f"https://{dcnm_ip}/rest/interface/deploy"
@@ -16,20 +16,20 @@ for i in range(2, len(access_interface_add['A']) + 1):
         "policy": "int_access_host_11_1",
         "interfaces": [
             {
-                "serialNumber": access_interface_add[f'A{i}'].value,
+                "serialNumber": access_interface_add[f'B{i}'].value,
                 "interfaceType": "INTERFACE_ETHERNET",
-                "ifName": "Ethernet" + access_interface_add[f'B{i}'].value,
+                "ifName": "Ethernet" + access_interface_add[f'C{i}'].value,
                 "fabricName": "SoAZ-PHX",
                 "nvPairs": {
-                    "BPDUGUARD_ENABLED": str.lower(access_interface_add[f'E{i}'].value),
-                    "PORTTYPE_FAST_ENABLED": str.lower(access_interface_add[f'F{i}'].value),
-                    "MTU": str.lower(access_interface_add[f'G{i}'].value),
-                    "SPEED": access_interface_add[f'D{i}'].value,
-                    "ACCESS_VLAN": "",
-                    "DESC": access_interface_add[f'C{i}'].value,
+                    "BPDUGUARD_ENABLED": str.lower(access_interface_add[f'F{i}'].value),
+                    "PORTTYPE_FAST_ENABLED": str.lower(access_interface_add[f'G{i}'].value),
+                    "MTU": str.lower(access_interface_add[f'H{i}'].value),
+                    "SPEED": access_interface_add[f'E{i}'].value,
+                    "ACCESS_VLAN": str(access_interface_add[f'J{i}'].value),
+                    "DESC": access_interface_add[f'D{i}'].value,
                     "CONF": "",
-                    "ADMIN_STATE": str.lower(access_interface_add[f'H{i}'].value),
-                    "INTF_NAME": "Ethernet" + access_interface_add[f'B{i}'].value
+                    "ADMIN_STATE": str.lower(access_interface_add[f'I{i}'].value),
+                    "INTF_NAME": "Ethernet" + access_interface_add[f'C{i}'].value
                 }
             }
         ]

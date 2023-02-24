@@ -2,68 +2,114 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 from openpyxl import Workbook, load_workbook
+from DCNM_Authentication import headers_token, fabric_name, url_logout, dcnm_ip
 
-##### this section gathers the token from DCNM which will be used for the subsequent Get or Post requests####
-dcnm_ip = "10.122.104.50"
-fabric_name = "AZ-Phoenix"
-url_login = f"https://{dcnm_ip}/rest/logon"
-url_logout = f"https://{dcnm_ip}/rest/logout"
-requests.packages.urllib3.disable_warnings()
-dcnm_creds = HTTPBasicAuth('admin', 'C!sc0123')
-headers = {'Content-Type': 'application/json'}
-request_body = {"expirationTime": "999999"}
+# this section loads the VLAN-Details.xlsx into the program
 
-response = requests.post(url_login, headers=headers, auth=dcnm_creds, verify=False, data=json.dumps(request_body))
-dcnm_token = json.loads(response.text)['Dcnm-Token']  ##the token returned from dcnm is stored in this variable
-headers_token = {'Content-Type': 'application/json', 'dcnm-token': str(dcnm_token)}
-
-#### this section loads the VLAN-Details.xlsx into the program
-
-wb = load_workbook(
-    '/Users/krishna/python-projects/My_venvs/venv1-enterprise/dcnm-python-Testing/Create-VLANs/VLAN-Details.xlsx')
-network_attach = wb["VLAN-Association"]
+wb = load_workbook("Interface-Details-Retirement.xlsx")
+network_attach_trunk = wb["Trunk-Interface-Details"]
+network_attach_access = wb["Access-Interface-Details"]
+all_networks = wb["all-networks"]
+final_vlan_list = []
+vlan_network_name_mapper = {}
 url_network_attach = f"https://{dcnm_ip}/rest/top-down/fabrics/{fabric_name}/networks/attachments"
 url_network_deploy = f"https://{dcnm_ip}/rest/top-down/fabrics/{fabric_name}/networks/deployments"
-# url_role = f"https://{dcnm_ip}/rest/control/switches/roles" ####default role is Leaf
 
-###### Attach Networks/VLANs #####
-for i in range(2, len(network_attach['A']) + 1):
-    network_attach_details = [{
-        "networkName": network_attach[f'A{i}'].value,
-        "lanAttachList": [
-            {
-                "fabric": fabric_name,
-                "networkName": network_attach[f'A{i}'].value,
-                "serialNumber": network_attach[f'C{i}'].value,
-                "switchPorts": network_attach[f'E{i}'].value,
-                "detachSwitchPorts": "",
-                "vlan": network_attach[f'F{i}'].value,
-                "untagged": 'false',
-                "freeformConfig": "",
-                "deployment": 'true',
-                "extensionValues": "",
-                "instanceValues": ""
-            },
-            {
-                "fabric": fabric_name,
-                "networkName": network_attach[f'A{i}'].value,
-                "serialNumber": network_attach[f'D{i}'].value,
-                "switchPorts": network_attach[f'E{i}'].value,
-                "detachSwitchPorts": "",
-                "vlan": network_attach[f'F{i}'].value,
-                "untagged": 'false',
-                "freeformConfig": "",
-                "deployment": 'true',
-                "extensionValues": "",
-                "instanceValues": ""
-            }
-        ]
-    }]
-    network_deploy = {"networkNames": network_attach[f'A{i}'].value}
-    response = requests.post(url_network_attach, headers=headers_token, verify=False,
-                             data=json.dumps(network_attach_details))
-    response_deploy = requests.post(url_network_deploy, headers=headers_token, verify=False,
-                                    data=json.dumps(network_deploy))
-    print(response_deploy.text)
+for i in range(2, len(network_attach_trunk['A']) + 1):
+    vlan_list = network_attach_trunk[f'J{i}'].value.split(',')
+    final_vlan_list.extend(x for x in vlan_list if x not in final_vlan_list)
+    for x in final_vlan_list:
+        for y in range(2, len(all_networks['A']) + 1):
+            if x == str(all_networks[f'AA{y}'].value):
+                vlan_network_name_mapper.update({x: all_networks[f'G{y}'].value})
+        network_attach_details = [{
+            "networkName": vlan_network_name_mapper[x],
+            "lanAttachList": [
+                {
+                    "fabric": fabric_name,
+                    "networkName": vlan_network_name_mapper[x],
+                    "serialNumber": network_attach_trunk[f'B{i}'].value,
+                    "switchPorts": "",
+                    "detachSwitchPorts": "",
+                    "vlan": x,
+                    "untagged": 'false',
+                    "freeformConfig": "",
+                    "deployment": 'true',
+                    "extensionValues": "",
+                    "instanceValues": ""
+                },
+                {
+                    "fabric": fabric_name,
+                    "networkName": vlan_network_name_mapper[x],
+                    "serialNumber": network_attach_trunk[f'C{i}'].value,
+                    "switchPorts": "",
+                    "detachSwitchPorts": "",
+                    "vlan": x,
+                    "untagged": 'false',
+                    "freeformConfig": "",
+                    "deployment": 'true',
+                    "extensionValues": "",
+                    "instanceValues": ""
+                }
+            ]
+        }]
+        print(network_attach_details)
+        response = requests.post(url_network_attach, headers=headers_token, verify=False,
+                                 data=json.dumps(network_attach_details))
+        # response_deploy = requests.post(url_network_deploy, headers=headers_token, verify=False,
+        #                                  data=json.dumps(network_deploy))
+        print(response.text)
+    final_vlan_list = []
+    vlan_network_name_mapper = {}
 
+final_vlan_list = []
+vlan_network_name_mapper = {}
+
+for i in range(2, len(network_attach_access['A']) + 1):
+    vlan_list = str(network_attach_access[f'K{i}'].value)
+    final_vlan_list.append(vlan_list)
+    # final_vlan_list.extend(x for x in vlan_list if x not in final_vlan_list)
+    for x in final_vlan_list:
+        for y in range(2, len(all_networks['A']) + 1):
+            if x == str(all_networks[f'AA{y}'].value):
+                vlan_network_name_mapper.update({x: all_networks[f'G{y}'].value})
+        network_attach_details = [{
+            "networkName": vlan_network_name_mapper[x],
+            "lanAttachList": [
+                {
+                    "fabric": fabric_name,
+                    "networkName": vlan_network_name_mapper[x],
+                    "serialNumber": network_attach_access[f'B{i}'].value,
+                    "switchPorts": "",
+                    "detachSwitchPorts": "",
+                    "vlan": x,
+                    "untagged": 'false',
+                    "freeformConfig": "",
+                    "deployment": 'true',
+                    "extensionValues": "",
+                    "instanceValues": ""
+                },
+                {
+                    "fabric": fabric_name,
+                    "networkName": vlan_network_name_mapper[x],
+                    "serialNumber": network_attach_access[f'C{i}'].value,
+                    "switchPorts": "",
+                    "detachSwitchPorts": "",
+                    "vlan": x,
+                    "untagged": 'false',
+                    "freeformConfig": "",
+                    "deployment": 'true',
+                    "extensionValues": "",
+                    "instanceValues": ""
+                }
+            ]
+        }]
+        print(network_attach_details)
+        response = requests.post(url_network_attach, headers=headers_token, verify=False,
+                                 data=json.dumps(network_attach_details))
+        # response_deploy = requests.post(url_network_deploy, headers=headers_token, verify=False,
+        #                                  data=json.dumps(network_deploy))
+        print(response.text)
+    final_vlan_list = []
+    vlan_network_name_mapper = {}
 requests.post(url_logout, headers=headers_token, verify=False)
